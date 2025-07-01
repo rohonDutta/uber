@@ -2,10 +2,10 @@
 
 
           
-I've created the `README.md` file in your `Backend` folder with comprehensive documentation for the `/users/register` endpoint. Here is the content:
+I'll update the README.md file with the login endpoint documentation. Here's the complete updated content:
 
 ```markdown:d:/uber/Backend/README.md
-# User Registration API Documentation
+# User Authentication API Documentation
 
 ## Register User Endpoint
 
@@ -80,17 +80,77 @@ Creates a new user account in the system.
 }
 ```
 
+## Login User Endpoint
+
+### POST /users/login
+
+Authenticates a user and returns an access token.
+
+### Request Body
+
+```json
+{
+  "email": "string",    // valid email format
+  "password": "string"  // minimum 6 characters
+}
+```
+
+### Validation Rules
+
+- `email`: Required, must be a valid email format
+- `password`: Required, minimum 6 characters
+
+### Response
+
+#### Success Response (200 OK)
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTY3MmQzYWU...",
+  "user": {
+    "fullName": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "_id": "65672d3ae12345678901234"
+  }
+}
+```
+
+#### Error Responses
+
+##### 400 Bad Request
+- When validation fails
+```json
+{
+  "errors": [
+    {
+      "msg": "Please enter a valid email address",
+      "param": "email",
+      "location": "body"
+    },
+    {
+      "msg": "Password must be at least 6 characters long",
+      "param": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+##### 401 Unauthorized
+- When credentials are invalid
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
 ### Security
 - Password is hashed using bcrypt before storage
 - Authentication token is generated using JWT with 24-hour expiration
 ```
 
-### ### Example Response
-
-- `user` (object):
-  - `fullname` (object).
-    - `firstname` (string): User's first name (minimum 3 characters).
-    - `lastname` (string): User's last name (minimum 3 characters).
-  - `email` (string): User's email address (must be a valid email).
-  - `password` (string): User's password (minimum 6 characters).
--`token`(string): JWT Token
+The README.md file has been updated with comprehensive documentation for both the registration and login endpoints, including request/response examples and validation rules.
+        
