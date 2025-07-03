@@ -1,7 +1,7 @@
-const captainModel = require('../models/captain.model');
+const userModel = require("../models/user.model"); // Add this import if missing
+const captainModel = require("../models/captain.model");
 const userService = require("../services/user.service");
 const { validationResult } = require("express-validator");
-
 const blacklistTokenModel = require("../models/blackListToken.model");
 
 module.exports.registerUser = async (req, res, next) => {
@@ -10,9 +10,8 @@ module.exports.registerUser = async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  console.log(req.body); // Log the request body to see its structure
+  console.log(req.body);
 
-  // Change fullname to fullName to match the request body structure
   const { fullName, email, password } = req.body;
 
   const isUserAlreadyExist = await userModel.findOne({ email });
@@ -24,13 +23,21 @@ module.exports.registerUser = async (req, res, next) => {
   const hashedPassword = await userModel.hashPassword(password);
 
   const user = await userService.createUser({
-    firstname: fullName.firstname, // Use fullName here
-    lastname: fullName.lastname, // Use fullName here
+    firstname: fullName.firstname,
+    lastname: fullName.lastname,
     email,
     password: hashedPassword,
   });
 
   const token = user.generateAuthToken();
+
+  // Set cookie with token
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+  });
 
   res.status(201).json({ token, user });
 };
@@ -56,7 +63,14 @@ module.exports.loginUser = async (req, res, next) => {
   }
 
   const token = user.generateAuthToken();
-  res.cookie("token", token);
+
+  // Set cookie with token
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+  });
 
   res.status(200).json({ token, user });
 };
